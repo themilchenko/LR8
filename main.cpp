@@ -9,13 +9,13 @@
 6) добавление значения по индексу +
 7) добавление значения по указателю (после элемента, указатель на который
 передан)  +
-8) извлечение значения из начала +
-9) извлечение значения из конца +
-10) извлечение по индексу +
+8) извлечение значения из начала +?
+9) извлечение значения из конца +?
+10) извлечение по индексу +?
 11) извлечение по указателю (извлекается элемент, указатель на который
-передан) +
+передан) +?
 12) получение значения по индексу +
-13) поиск позиции первого элемента, равного по значению искомому
+13) поиск позиции первого элемента, равного по значению искомому +
 14) печать на экран  +
  */
 
@@ -212,6 +212,32 @@ T get_value(const Ring<T>& ring, unsigned int position)
 
 template <typename T>
 T find(const Ring<T>& ring, T value)
+{
+    unsigned int position = 1;
+    Node<T> *element = ring.head;
+    while (element->information != value)
+    {
+        if (element != ring.head)
+        {
+            position++;
+            element = element->next;
+        }
+        else if ((position == 1) && (element == ring.head))
+        {
+            position++;
+            element = element->next;
+        }
+        else
+        {
+            position = -1;
+            break;
+        }
+    }
+    if (position != -1)
+        return position;
+    else
+        return 0;
+}
 
 template <typename T>
 void print(const Ring<T> & ring)
@@ -273,6 +299,10 @@ int main()
 
     std::cout << "Get value: " << get_value(ring, 2) << std::endl << std::endl;
 
+    if (find(ring, 6) != 0)
+        std::cout << "Find value: " << find(ring, 141);
+    else
+        std::cout << "There is no element you searched.";
 
     return 0;
 }
