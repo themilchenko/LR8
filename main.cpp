@@ -6,15 +6,15 @@
 3) подсчёт кол-ва элементов  +
 4) добавление значения в начало  +
 5) добавление значения в конец  +
-6) добавление значения по индексу
+6) добавление значения по индексу +
 7) добавление значения по указателю (после элемента, указатель на который
-передан)
-8) извлечение значения из начала
-9) извлечение значения из конца
-10) извлечение по индексу
+передан)  +
+8) извлечение значения из начала +
+9) извлечение значения из конца +
+10) извлечение по индексу +
 11) извлечение по указателю (извлекается элемент, указатель на который
-передан)
-12) получение значения по индексу
+передан) +
+12) получение значения по индексу +
 13) поиск позиции первого элемента, равного по значению искомому
 14) печать на экран  +
  */
@@ -34,7 +34,7 @@ struct Ring
 {
     Node<T> *head;
     Node<T> *tail;
-    int size = 0;
+    unsigned int size = 0;
 };
 
 template <typename T>
@@ -59,7 +59,7 @@ void destructor(Ring<T>& ring)
 template <typename T>
 unsigned int size(const Ring<T>& ring)
 {
-    int size = ring.size;
+    unsigned int size = ring.size;
     return size;
 }
 
@@ -99,23 +99,119 @@ void insert_tail(Ring<T>& ring, T information)
 }
 
 template <typename T>
-void insert_index(Ring<T>& ring, T information, int index)
+void insert_index(Ring<T>& ring, T information, int position)
 {
+    if (position == 1)
+        insert_head(ring, information);
+    else if (position == ring.size + 1)
+        insert_tail(ring, information);
+    else
+    {
+        ring.size++;
+        Node<T> *new_element = new Node<T>;
+        new_element->information = information;
+        unsigned int counter = 0;
+        Node<T> *element = ring.head;
+        for (int i = 0; i < position - 2; i++)
+            element = element->next;
+        new_element->previous = element;
+        element = element->next;
+        new_element->next = element;
+        new_element->previous->next = new_element;
+        new_element->next->previous = new_element;
+    }
+}
 
+template <typename T>
+void insert_pointer(Ring<T>& ring, T information, Node<T>* pointer)
+{
+    ring.size++;
+    Node<T> *new_element = new Node<T>;
+    new_element->information = information;
+    new_element->previous = pointer->previous;
+    new_element->next = pointer;
+    new_element->previous->next = new_element;
+    new_element->next->previous = new_element;
 }
 
 template <typename T>
 T pop_head(Ring<T>& ring)
 {
-    Node<T> *element = new Node<T>;
-    ring.tail->next = ring.head->next;
+    ring.size--;
+    Node<T> *current = ring.head;
+    T information = ring.head->information;
     ring.head->next->previous = ring.tail;
-    T final = ring.head->information;
-    element = ring.head->next;
-    delete ring.head;
-    ring.head = element;
-    return final;
+    ring.tail->next = ring.head->next;
+    ring.head = ring.head->next;
+    delete current;
+    return information;
 }
+
+template <typename T>
+T pop_tail(Ring<T>& ring)
+{
+    ring.size--;
+    Node<T> *current = ring.tail;
+    T information = ring.tail->information;
+    ring.tail->previous->next = ring.head;
+    ring.head->previous = ring.tail->previous;
+    ring.tail = ring.tail->previous;
+    delete current;
+    return information;
+}
+
+template <typename T>
+T pop_index(Ring<T>& ring, unsigned int position)
+{
+    ring.size--;
+    if (position == 1)
+        pop_head(ring);
+    else if (position == ring.size)
+        pop_tail(ring);
+    else
+    {
+        unsigned int counter = 0;
+        Node<T> *element = new Node<T>;
+        element = ring.head;
+        while (counter != position)
+        {
+            element = element->next;
+            counter++;
+        }
+        element->previous->next = element->next;
+        element->next->previous = element->previous;
+        T used = element->information;
+        delete element;
+        return used;
+    }
+}
+
+template <typename T>
+T pop_pointer(Ring<T>& ring, Node<T> *pointer)
+{
+    pointer->next->previous = pointer->previous;
+    pointer->previous->next = pointer->next;
+    T used = pointer->information;
+    delete pointer;
+    return used;
+}
+
+template <typename T>
+T get_value(const Ring<T>& ring, unsigned int position)
+{
+    unsigned int counter = 0;
+    Node<T> *element = ring.head;
+    while (counter != position)
+    {
+        element = element->next;
+        counter++;
+    }
+    element = element->next;
+    return element->information;
+}
+
+template <typename T>
+T find(const Ring<T>& ring, T value)
 
 template <typename T>
 void print(const Ring<T> & ring)
@@ -137,14 +233,46 @@ int main()
     insert_head(ring, 2);
     insert_head(ring, 1);
     insert_tail(ring, 3);
+    insert_tail(ring, 4);
 
     std::cout << "Elements: ";
     print(ring);
-    std::cout << std::endl;
+    std::cout << std::endl <<"Size: " << size(ring) << std::endl << std::endl;
 
-    std::cout << size(ring);
+    insert_index(ring, 10, 2);
+    std::cout << "Elements: ";
+    print(ring);
+    std::cout << std::endl << "Size: " << ring.size << std::endl << std::endl;
 
-    std::cout << std::endl << "pop: " << pop_head(ring);
+    Node<int> *pointer1 = ring.head->next;
+    insert_pointer(ring, 9, pointer1);
+    std::cout << "After insert by pointer: ";
+    print(ring);
+    std::cout << std::endl << "Size: " << ring.size << std::endl << std::endl;
+
+    pop_head(ring);
+    std::cout << "Elements after pop_head: ";
+    print(ring);
+    std::cout << std::endl << "Size: " << ring.size << std::endl << std::endl;
+
+    pop_tail(ring);
+    std::cout << "Elements after pop_tail: ";
+    print(ring);
+    std::cout << std::endl << "Size: " << ring.size << std::endl << std::endl;
+
+    pop_index(ring, 2);
+    std::cout << "Elements after pop_index: ";
+    print(ring);
+    std::cout << std::endl << "Size: " << ring.size << std::endl << std::endl;
+
+    Node<int> *pointer2 = ring.head->next;
+    pop_pointer(ring, pointer2);
+    std::cout << "Elements after pop_pointer: ";
+    print(ring);
+    std::cout << std::endl << "Size: " << ring.size << std::endl << std::endl;
+
+    std::cout << "Get value: " << get_value(ring, 2) << std::endl << std::endl;
+
 
     return 0;
 }
