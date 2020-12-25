@@ -1,14 +1,38 @@
 #include <iostream>
+#include <string>
 
 struct people
 {
     std::string name;
     int mark;
+
+    int operator = (int flag)
+    {
+        flag = 0;
+        name = "";
+        mark = 0;
+        return flag;
+    }
+
+    int operator != (int flag)
+    {
+        if (name != "" && mark != 0)
+        {
+            flag = 1;
+            return flag;
+        }
+        else
+        {
+            flag = 0;
+            return flag;
+        }
+    }
 };
 
-std::ostream& operator<< (std::ostream& output, const people& person)
+std::ostream& operator << (std::ostream &output, const people &person)
 {
-    output << "Name: " << person.name << "Mark: " << person.mark;
+    output << "Name: " << person.name << " Mark: " << person.mark << std::endl;
+    return output;
 }
 
 template <typename T, int size>
@@ -134,15 +158,16 @@ void print_info(const List<T, size>& list)
         std::cout << "There aren't elements" << std::endl;
     else
     {
-        std::cout << "Array: ";
+        std::cout << "Array: " << std::endl;
         for (int i = 0; i < Lengh(list); i++)
-            std::cout << list.array[i] << " ";
+            std::cout << i + 1 << ") " << list.array[i] << " ";
         std::cout << std::endl << "Size: " << list.current << std::endl << std::endl;
     }
 }
 
 int main()
 {
+    /*
     List<int, 10> list;
     constructor(list);
     push_tail(list, 20);
@@ -203,13 +228,13 @@ int main()
     destructor(list);
 
     print_info(list);
-
+*/
     List<people, 4> human;
 
     people man1 = { "Oleg", 5 };
-    people man2 = { "Viktor", 4};
-    people woman1 = { "Marina", 3};
-    people woman2 = { "Vasilisa", 2};
+    people man2 = { "Viktor", 4 };
+    people woman1 = { "Marina", 3 };
+    people woman2 = { "Vasilisa", 2 };
 
     constructor(human);
 
@@ -220,7 +245,11 @@ int main()
 
     print_info(human);
 
+    pop_head(human);
+    pop_tail(human);
+    pop_index(human, 2);
 
+    print_info(human);
 
     return 0;
 }
