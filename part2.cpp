@@ -160,14 +160,14 @@ void print_info(const List<T, size>& list)
     {
         std::cout << "Array: " << std::endl;
         for (int i = 0; i < Lengh(list); i++)
-            std::cout << i + 1 << ") " << list.array[i] << " ";
+            std::cout << list.array[i] << " ";
         std::cout << std::endl << "Size: " << list.current << std::endl << std::endl;
     }
 }
 
 int main()
 {
-    /*
+
     List<int, 10> list;
     constructor(list);
     push_tail(list, 20);
@@ -228,7 +228,7 @@ int main()
     destructor(list);
 
     print_info(list);
-*/
+
     List<people, 4> human;
 
     people man1 = { "Oleg", 5 };
@@ -248,6 +248,12 @@ int main()
     pop_head(human);
     pop_tail(human);
     pop_index(human, 2);
+
+    print_info(human);
+
+    std::cout << "Get_value: " << get_value(human, 1) << std::endl;
+
+    destructor(human);
 
     print_info(human);
 
