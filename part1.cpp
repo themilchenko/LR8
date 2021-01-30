@@ -4,8 +4,8 @@ template <typename T>
 struct Node
 {
     T information;
-    Node *next = nullptr;
-    Node *previous = nullptr;
+    Node* next = nullptr;
+    Node* previous = nullptr;
 };
 
 struct people
@@ -24,8 +24,8 @@ std::ostream& operator<< (std::ostream& output, const people& person)
 template <typename T>
 struct Ring
 {
-    Node<T> *head;
-    Node<T> *tail;
+    Node<T>* head;
+    Node<T>* tail;
     unsigned int size;
 };
 
@@ -42,7 +42,7 @@ void destructor(Ring<T>& ring)
 {
     while (ring.size != 0)
     {
-        Node<T> *element = ring.head->next;
+        Node<T>* element = ring.head->next;
         delete ring.head;
         ring.head = element;
         ring.size--;
@@ -60,7 +60,7 @@ template <typename T>
 void insert_head(Ring<T>& ring, T information)
 {
     ring.size++;
-    Node<T> *element = new Node<T>;
+    Node<T>* element = new Node<T>;
     element->information = information;
     if (ring.head == nullptr)
     {
@@ -83,7 +83,7 @@ template <typename T>
 void insert_tail(Ring<T>& ring, T information)
 {
     ring.size++;
-    Node<T> *element = new Node<T>;
+    Node<T>* element = new Node<T>;
     element->information = information;
     if (ring.head == nullptr)
     {
@@ -105,23 +105,26 @@ void insert_tail(Ring<T>& ring, T information)
 template <typename T>
 void insert_index(Ring<T>& ring, T information, int position)
 {
-    if (position == 1)
+    if (position == 0)
         insert_head(ring, information);
-    else if (position == ring.size + 1)
+    else if (position == ring.size)
         insert_tail(ring, information);
     else
     {
         ring.size++;
-        Node<T> *new_element = new Node<T>;
+        Node<T>* new_element = new Node<T>;
         new_element->information = information;
-        Node<T> *element = ring.head;
-        for (int i = 0; i < position - 2; i++)
+        Node<T>* element = ring.head;
+
+        for (int i = 0; i < position - 1; i++)
             element = element->next;
-        new_element->previous = element;
-        element = element->next;
-        new_element->next = element;
-        new_element->previous->next = new_element;
-        new_element->next->previous = new_element;
+
+        new_element->previous = element;             /*связали новый элемент с предыдущим*/
+
+        element = element->next;                     /*временным элементом пошли на один шаг вперед*/
+        new_element->next = element;                 /*связали новый элемент со следующим элементом*/
+        new_element->previous->next = new_element;   /*связали предыдущий элемент с новым элементом*/
+        new_element->next->previous = new_element;   /*связали следующий элемент с новым элементом*/
     }
 }
 
@@ -129,19 +132,19 @@ template <typename T>
 void insert_pointer(Ring<T>& ring, T information, Node<T>* pointer)
 {
     ring.size++;
-    Node<T> *element = new Node<T>;
-    element->information = information;
-    element->previous = pointer->previous;
-    element->next = pointer;
-    element->previous->next = element;
-    element->next->previous = element;
+    Node<T>* element = new Node<T>;                  /*создаем динамически новый элемент*/
+    element->information = information;              /*кладем туда значение*/
+    element->previous = pointer;                     /*связываем новый элемент с элементом, указатель на который бвл передан*/
+    element->next = pointer->next;                   /*связываем новый элемент со следующим*/
+    element->previous->next = element;               /*связываем предыдущий элемент с добавленным*/
+    element->next->previous = element;               /*связываем следующий элемент с добавленным*/
 }
 
 template <typename T>
 T pop_head(Ring<T>& ring)
 {
     ring.size--;
-    Node<T> *current = ring.head;
+    Node<T>* current = ring.head;
     T inf = ring.head->information;
     ring.head->next->previous = ring.tail;
     ring.tail->next = ring.head->next;
@@ -154,7 +157,7 @@ template <typename T>
 T pop_tail(Ring<T>& ring)
 {
     ring.size--;
-    Node<T> *current = ring.tail;
+    Node<T>* current = ring.tail;
     T information = ring.tail->information;
     ring.tail->previous->next = ring.head;
     ring.head->previous = ring.tail->previous;
@@ -166,14 +169,14 @@ T pop_tail(Ring<T>& ring)
 template <typename T>
 T pop_index(Ring<T>& ring, unsigned int position)
 {
-    if (position == 1)
+    if (position == 0)
         pop_head(ring);
     else if (position == size(ring))
         pop_tail(ring);
     else
     {
-        unsigned int counter = 1;
-        Node<T> *element = new Node<T>;
+        unsigned int counter = 0;
+        Node<T>* element = new Node<T>;
         element = ring.head;
         while (counter != position)
         {
@@ -190,21 +193,27 @@ T pop_index(Ring<T>& ring, unsigned int position)
 }
 
 template <typename T>
-T pop_pointer(Ring<T>& ring, Node<T> *pointer)
+T pop_pointer(Ring<T>& ring, Node<T>* pointer)
 {
     ring.size--;
-    pointer->next->previous = pointer->previous;
-    pointer->previous->next = pointer->next;
-    T used = pointer->information;
-    delete pointer;
+
+    Node<T>* element = new Node<T>;
+    element = ring.head;
+    while (element != pointer)
+        element = element->next;
+
+    element->next->previous = element->previous;
+    element->previous->next = element->next;
+    T used = element->information;
+    delete element;
     return used;
 }
 
 template <typename T>
 T get_value(const Ring<T>& ring, unsigned int position)
 {
-    unsigned int counter = 1;
-    Node<T> *element = ring.head;
+    unsigned int counter = 0;
+    Node<T>* element = ring.head;
     while (counter != position)
     {
         element = element->next;
@@ -217,36 +226,25 @@ T get_value(const Ring<T>& ring, unsigned int position)
 template <typename T>
 T find(const Ring<T>& ring, T value)
 {
-    unsigned int position = 1;
-    Node<T> *element = ring.head;
+    unsigned int position = 0;
+    Node<T>* element = ring.head;
     while (element->information != value)
     {
-        if (element != ring.head)
-        {
-            position++;
-            element = element->next;
-        }
-        else if ((position == 1) && (element == ring.head))
-        {
-            position++;
-            element = element->next;
-        }
-        else
-        {
-            position = -1;
-            break;
-        }
+        
+
+        position++;
+        element = element->next;
     }
-    if (position != -1)
+    if (position != ring.size)
         return position;
     else
-        return 0;
+        return -1;
 }
 
 template <typename T>
 void print(const Ring<T>& ring)
 {
-    Node<T> *element = ring.head;
+    Node<T>* element = ring.head;
     do
     {
         std::cout << element->information << ' ';
@@ -269,14 +267,14 @@ int main()
 
     std::cout << "Elements: ";
     print(ring);
-    std::cout << std::endl <<"Size: " << size(ring) << std::endl << std::endl;
+    std::cout << std::endl << "Size: " << size(ring) << std::endl << std::endl;
 
     insert_index(ring, 10, 2);
     std::cout << "Elements: ";
     print(ring);
     std::cout << std::endl << "Size: " << ring.size << std::endl << std::endl;
 
-    Node<int> *pointer1 = ring.head->next;
+    Node<int>* pointer1 = ring.head->next;
     insert_pointer(ring, 9, pointer1);
     std::cout << "After insert by pointer: ";
     print(ring);
@@ -297,13 +295,16 @@ int main()
     print(ring);
     std::cout << std::endl << "Size: " << ring.size << std::endl << std::endl;
 
-    Node<int> *pointer2 = ring.head->next;
+    Node<int>* pointer2 = ring.head->next;
     std::cout << "Popped_pointer element is " << pop_pointer(ring, pointer2) << std::endl;
     std::cout << "Elements after pop_pointer: ";
     print(ring);
     std::cout << std::endl << "Size: " << ring.size << std::endl << std::endl;
 
-    std::cout << "Get value: " << get_value(ring, 5) << std::endl << std::endl;
+    if (0 > ring.size)
+        std::cout << "There is no element with this index";
+    else 
+        std::cout << "Get value: " << get_value(ring, 0) << std::endl << std::endl;
 
     if (find(ring, 3) != -1)
         std::cout << "find value: " << find(ring, 3);
@@ -331,15 +332,15 @@ int main()
     print(human);
     std::cout << "Size of human: " << size(human) << std::endl << std::endl;
 
-    people man3 = { "Grigory", 42, "Programming"};
+    people man3 = { "Grigory", 42, "Programming" };
     insert_index(human, man3, 3);
 
     std::cout << "People after insert_index: " << std::endl;
     print(human);
     std::cout << "Size of human: " << size(human) << std::endl << std::endl;
 
-    people woman3 = { "Maria", 23, "Tennis"};
-    Node<people> *pointer3 = human.head->next;
+    people woman3 = { "Maria", 23, "Tennis" };
+    Node<people>* pointer3 = human.head->next;
     insert_pointer(human, woman3, pointer3);
 
     std::cout << "People after insert_pointer: " << std::endl;
@@ -361,12 +362,17 @@ int main()
     print(human);
     std::cout << std::endl << "Size: " << size(human) << std::endl << std::endl;
 
-    std::cout << "Popped_pointer element is " << pop_pointer(human, pointer3) << std::endl;
+    Node<people>* pointer4 = human.head->next;
+    std::cout << "Popped_pointer element is " << pop_pointer(human, pointer4) << std::endl;
     std::cout << "People after pop_pointer:" << std::endl;
     print(human);
     std::cout << std::endl << "Size: " << size(human) << std::endl << std::endl;
 
-    std::cout << "Get value: " << get_value(human, 2) << std::endl << std::endl;
+    if (1 > human.size)
+        std::cout << "There is no element with this index";
+    else
+        std::cout << "Get value: " << get_value(human, 1) << std::endl << std::endl;
+
     destructor(human);
 
     std::cout << "Size after destructor: " << size(human);
