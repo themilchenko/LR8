@@ -29,7 +29,7 @@ struct people
     }
 };
 
-std::ostream& operator << (std::ostream &output, const people &person)
+std::ostream& operator << (std::ostream& output, const people& person)
 {
     output << "Name: " << person.name << " Mark: " << person.mark << std::endl;
     return output;
@@ -61,21 +61,16 @@ void destructor(List<T, size>& list)
 template <typename T, int size>
 unsigned int Lengh(const List<T, size>& list)
 {
-    unsigned int sum = 0;
-    for (int i = 0; i < list.current; i++)
-        sum++;
-    return sum;
+    return list.current;
 }
 
 template <typename T, int size>
 void push_tail(List<T, size>& list, T digit)
 {
     list.current++;
-    int i = 0;
-    while (list.array[i] != 0)
-        i++;
+
     if (list.current < size)
-        list.array[i] = digit;
+        list.array[list.current - 1] = digit;
     else
     {
         std::cout << "Array is full" << std::endl << std::endl;
@@ -98,20 +93,16 @@ void push_index(List<T, size>& list, T digit, int index)
 }
 
 template <typename T, int size>
-T pop_head(List<T, size>& list)
+T pop_tail(List<T, size>& list)
 {
     T element = list.array[list.current - 1];
-    for (int i = list.current - 1; i > 0; i--)
-        list.array[i] = list.array[i - 1];
-    for (int i = 0; i < list.current; i++)
-        list.array[i] = list.array[i + 1];
     list.array[list.current - 1] = 0;
     list.current--;
     return element;
 }
 
 template <typename T, int size>
-T pop_tail(List<T, size>& list)
+T pop_head(List<T, size>& list)
 {
     T element = list.array[0];
     for (int i = 1; i < list.current; i++)
@@ -169,7 +160,9 @@ int main()
 {
 
     List<int, 10> list;
+
     constructor(list);
+
     push_tail(list, 20);
     push_tail(list, 19);
     push_tail(list, 18);
@@ -183,7 +176,7 @@ int main()
     print_info(list);
     std::cout << std::endl;
 
-    push_index(list, 100, 2);
+    push_index(list, 0, 2);
 
     print_info(list);
     std::cout << std::endl;
@@ -200,22 +193,22 @@ int main()
     push_index(list, 3, 3);
     push_tail(list, 5);
 
-    std:: cout << "Popped_head element is " << pop_head(list) << std::endl;
+    std::cout << "Popped_head element is " << pop_head(list) << std::endl;
     print_info(list);
 
-    std:: cout << "Popped_head element is " << pop_head(list) << std::endl;
+    std::cout << "Popped_head element is " << pop_head(list) << std::endl;
     print_info(list);
 
-    std:: cout << "Popped_tail element is " << pop_tail(list) << std::endl;
+    std::cout << "Popped_tail element is " << pop_tail(list) << std::endl;
     print_info(list);
 
-    std:: cout << "Popped_tail element is " << pop_tail(list) << std::endl;
+    std::cout << "Popped_tail element is " << pop_tail(list) << std::endl;
     print_info(list);
 
-    std:: cout << "Popped_head element is " << pop_head(list) << std::endl;
+    std::cout << "Popped_head element is " << pop_head(list) << std::endl;
     print_info(list);
 
-    std:: cout << "Popped_index element is " << pop_index(list, 5) << std::endl;
+    std::cout << "Popped_index element is " << pop_index(list, 5) << std::endl;
     print_info(list);
 
     std::cout << "Get_value element is " << get_value(list, 2) << std::endl << std::endl;
