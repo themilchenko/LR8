@@ -170,23 +170,27 @@ template <typename T>
 T pop_index(Ring<T>& ring, unsigned int position)
 {
     if (position == 0)
-        pop_head(ring);
-    else if (position == size(ring))
-        pop_tail(ring);
+        return pop_head(ring);
+    else if (position == size(ring) - 1)
+        return pop_tail(ring);
     else
     {
         unsigned int counter = 0;
         Node<T>* element = new Node<T>;
+
         element = ring.head;
         while (counter != position)
         {
             element = element->next;
             counter++;
         }
+
         element->previous->next = element->next;
         element->next->previous = element->previous;
+
         T used = element->information;
         ring.size--;
+
         delete element;
         return used;
     }
@@ -204,7 +208,9 @@ T pop_pointer(Ring<T>& ring, Node<T>* pointer)
 
     element->next->previous = element->previous;
     element->previous->next = element->next;
+
     T used = element->information;
+
     delete element;
     return used;
 }
@@ -228,10 +234,8 @@ T find(const Ring<T>& ring, T value)
 {
     unsigned int position = 0;
     Node<T>* element = ring.head;
-    while (element->information != value)
+    while (element->information != value && position != ring.size)
     {
-        
-
         position++;
         element = element->next;
     }
@@ -290,7 +294,7 @@ int main()
     print(ring);
     std::cout << std::endl << "Size: " << ring.size << std::endl << std::endl;
 
-    std::cout << "Popped_index element is " << pop_index(ring, 2) << std::endl;
+    std::cout << "Popped_index element is " << pop_index(ring, 0) << std::endl;
     std::cout << "Elements after pop_index: ";
     print(ring);
     std::cout << std::endl << "Size: " << ring.size << std::endl << std::endl;
@@ -303,11 +307,11 @@ int main()
 
     if (0 > ring.size)
         std::cout << "There is no element with this index";
-    else 
+    else
         std::cout << "Get value: " << get_value(ring, 0) << std::endl << std::endl;
 
-    if (find(ring, 3) != -1)
-        std::cout << "find value: " << find(ring, 3);
+    if (find(ring, 0) != -1)
+        std::cout << "find value: " << find(ring, 0);
     else
         std::cout << "There is no element you searched.";
 
