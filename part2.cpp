@@ -132,14 +132,11 @@ T get_value(List<T, size>& list, int index)
 template <typename T, int size>
 int find(List<T, size>& list, T value)
 {
-    int finish = -1;
     for (int i = 0; i < list.current; i++)
         if (list.array[i] == value)
-        {
-            finish = i + 1;
-            break;
-        }
-    return finish;
+            return i;
+
+    return -1;
 }
 
 template <typename T, int size>
