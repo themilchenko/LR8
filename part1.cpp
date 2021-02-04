@@ -176,9 +176,8 @@ T pop_index(Ring<T>& ring, unsigned int position)
     else
     {
         unsigned int counter = 0;
-        Node<T>* element = new Node<T>;
+        Node<T>* element = ring.head;
 
-        element = ring.head;
         while (counter != position)
         {
             element = element->next;
@@ -201,8 +200,8 @@ T pop_pointer(Ring<T>& ring, Node<T>* pointer)
 {
     ring.size--;
 
-    Node<T>* element = new Node<T>;
-    element = ring.head;
+    Node<T>* element = ring.head;
+
     while (element != pointer)
         element = element->next;
 
@@ -294,7 +293,7 @@ int main()
     print(ring);
     std::cout << std::endl << "Size: " << ring.size << std::endl << std::endl;
 
-    std::cout << "Popped_index element is " << pop_index(ring, 0) << std::endl;
+    std::cout << "Popped_index element is " << pop_index(ring, 2) << std::endl;
     std::cout << "Elements after pop_index: ";
     print(ring);
     std::cout << std::endl << "Size: " << ring.size << std::endl << std::endl;
@@ -305,7 +304,7 @@ int main()
     print(ring);
     std::cout << std::endl << "Size: " << ring.size << std::endl << std::endl;
 
-    if (0 > ring.size)
+    if (ring.size <= 0)
         std::cout << "There is no element with this index";
     else
         std::cout << "Get value: " << get_value(ring, 0) << std::endl << std::endl;
